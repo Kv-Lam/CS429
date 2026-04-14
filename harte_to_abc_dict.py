@@ -234,7 +234,7 @@ def harte_to_abc(chord):
 #chord6 = "Ab:sus4/2"
 #chord7 = "Gb:sus4(b7)/4"
 #chord8 = "B#:maj9(#11)/5"
-chord9 = "C:dim7"
+#chord9 = "C:dim7"
 
 #parse1 = parse_harte(chord1)
 #parse2 = parse_harte(chord2)
@@ -257,4 +257,4 @@ chord9 = "C:dim7"
 #print(harte_to_abc(chord6))
 #print(harte_to_abc(chord7))
 #print(harte_to_abc(chord8))
-print(harte_to_abc(chord9))
+#print(harte_to_abc(chord9))
