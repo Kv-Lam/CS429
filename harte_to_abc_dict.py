@@ -12,15 +12,65 @@ ROOT_TO_SEMITONE = {
 }
  
 DEGREE_TO_SEMITONE = {
-    "1": 0,  "2": 2,  "b2": 1,  "#2": 3,
-    "3": 4,  "b3": 3, "#3": 5,
-    "4": 5,  "b4": 4, "#4": 6,
-    "5": 7,  "b5": 6, "#5": 8,
-    "6": 9,  "b6": 8, "#6": 10,
-    "7": 11, "b7": 10, "#7": 12,
-    "9": 2,  "b9": 1, "#9": 3,
-    "11": 5, "b11": 4, "#11": 6,
-    "13": 9, "b13": 8, "#13": 10,
+    "1": 0,
+    "b1": 11,
+    "#1": 1,
+    "##1": 2,
+    "bb1": 10,
+
+    "2": 2,
+    "b2": 1,
+    "#2": 3,
+    "##2": 4,
+    "bb2": 0,
+
+    "3": 4,
+    "b3": 3,
+    "#3": 5,
+    "##3": 6,
+    "bb3": 2,
+
+    "4": 5,
+    "b4": 4,
+    "#4": 6,
+    "##4": 7,
+    "bb4": 3,
+
+    "5": 7,
+    "b5": 6,
+    "#5": 8,
+    "##5": 9,
+    "bb5": 5,
+
+    "6": 9,
+    "b6": 8,
+    "#6": 10,
+    "##6": 11,
+    "bb6": 7,
+
+    "7": 11,
+    "b7": 10,
+    "#7": 0,
+    "##7": 1,
+    "bb7": 9,
+
+    "9": 2,
+    "b9": 1,
+    "#9": 3,
+    "##9": 4,
+    "bb9": 0,
+
+    "11": 5,
+    "b11": 4,
+    "#11": 6,
+    "##11": 7,
+    "bb11": 3,
+
+    "13": 9,
+    "b13": 8,
+    "#13": 10,
+    "##13": 11,
+    "bb13": 7,
 }
 
 QUALITY_TO_INTERVALS = {
@@ -126,6 +176,23 @@ def spell_note(root, degree, target_semitone):
     else:
         return letter  # fallback (rare edge cases)
 
+def symbolize(notes):
+    new_notes = []
+
+    for note in notes:
+        if note.endswith("##"):
+            new_notes.append("^^" + note[0])
+        elif note.endswith("bb"):
+            new_notes.append("__" + note[0])
+        elif note.endswith("#"):
+            new_notes.append("^" + note[0])
+        elif note.endswith("b"):
+            new_notes.append("_" + note[0])
+        else:
+            new_notes.append(note)
+
+    return new_notes
+
 def harte_to_abc(chord):
     parsed = parse_harte(chord)
     if parsed is None:
@@ -153,6 +220,8 @@ def harte_to_abc(chord):
         bass_note = spell_note(r, b, bass_semitone)
 
         notes = [bass_note] + [n for n in notes if n != bass_note]
+    
+    notes = symbolize(notes) # convert to ABC accidental notation
 
     return "[" + " ".join(notes) + "]"
     
@@ -163,8 +232,9 @@ def harte_to_abc(chord):
 #chord4 = "Gb:maj9(#11)"
 #chord5 = "G:sus4(b7,9,13)"
 #chord6 = "Ab:sus4/2"
-#chord7 = "G:sus4(b7)/4"
+#chord7 = "Gb:sus4(b7)/4"
 #chord8 = "B#:maj9(#11)/5"
+chord9 = "C:dim7"
 
 #parse1 = parse_harte(chord1)
 #parse2 = parse_harte(chord2)
@@ -187,3 +257,4 @@ def harte_to_abc(chord):
 #print(harte_to_abc(chord6))
 #print(harte_to_abc(chord7))
 #print(harte_to_abc(chord8))
+print(harte_to_abc(chord9))
