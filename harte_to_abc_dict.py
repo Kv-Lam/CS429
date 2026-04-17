@@ -2,6 +2,7 @@ import re
 import jams
 import glob
 import os
+import json
 
 CHROMATIC = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
  
@@ -119,14 +120,10 @@ QUALITY_TO_INTERVALS = {
     "sus4(b7)": ["1", "4", "5", "b7"],
 }
 
-filename = "CS429/unique.txt"
-
 def load_chords(filename):
     with open(filename, "r") as f:
         chords = [line.strip() for line in f if line.strip()]
     return chords
-
-chords = load_chords(filename)
 
 def parse_harte(chord):
     if chord in ["N", "X"]:
@@ -231,6 +228,33 @@ def harte_to_abc(chord):
     notes = symbolize(notes) # convert to ABC accidental notation
 
     return "[" + " ".join(notes) + "]"
+
+def write_json_file(data, output_path):
+    file = output_path[19:-5] #Get rid of v1.0.0/v1.0.0/jams\ from the start and .jams from the end.
+    file = file + '_' + (data["representation"])
+    
+    with open("data/" + file + ".json", "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+    
+for jam_path in glob.glob("v1.0.0/v1.0.0/jams/billboard_*.jams"):
+    print("Processing:", jam_path)
+    
+    jam = jams.load(jam_path, validate=False)
+    ann = jam["annotations"][0]["data"]
+    metadata = jam["file_metadata"]
+    
+    
+    chords = [harte_to_abc(observation.value) for observation in ann]
+    chords = [c for c in chords if c is not None]
+    
+    data = {
+        "title": metadata["title"],
+        "representation": "ABC",
+        "chords": chords,
+    }
+    
+    write_json_file(data, jam_path)
+    
     
 #TESTING
 #chord1 = "C:maj7"
