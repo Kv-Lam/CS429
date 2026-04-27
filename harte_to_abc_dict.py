@@ -230,10 +230,10 @@ def harte_to_abc(chord):
     return "[" + " ".join(notes) + "]"
 
 def write_json_file(data, output_path):
-    file = output_path[19:-5] #Get rid of v1.0.0/v1.0.0/jams\ from the start and .jams from the end.
+    file = output_path[19:-5] #Get rid of v1.0.0/v1.0.0/jams/ from the start and .jams from the end.
     file = file + '_' + (data["representation"])
     
-    with open("data/" + file + ".json", "w", encoding="utf-8") as f:
+    with open("data/ABC/" + file + ".json", "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     
 for jam_path in glob.glob("v1.0.0/v1.0.0/jams/billboard_*.jams"):
