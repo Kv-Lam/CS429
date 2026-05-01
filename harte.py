@@ -21,6 +21,7 @@ for jam_path in glob.glob("v1.0.0/v1.0.0/jams/billboard_*.jams"):
     
     data = {
         "title": metadata["title"],
+        "key": jam["annotations"][1]["data"][0].value,
         "representation": "Harte",
         "chords": chords
     }

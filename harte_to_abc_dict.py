@@ -197,6 +197,21 @@ def symbolize(notes):
 
     return new_notes
 
+def key_conversion(note):
+    new_note = ""
+    if note.endswith("##"):
+        new_note = ("^^" + note[0])
+    elif note.endswith("bb"):
+        new_note = ("__" + note[0])
+    elif note.endswith("#"):
+        new_note = ("^" + note[0])
+    elif note.endswith("b"):
+        new_note = ("_" + note[0])
+    else:
+        new_note = note
+
+    return new_note
+
 def harte_to_abc(chord):
     parsed = parse_harte(chord)
     if parsed is None:
@@ -249,6 +264,7 @@ for jam_path in glob.glob("v1.0.0/v1.0.0/jams/billboard_*.jams"):
     
     data = {
         "title": metadata["title"],
+        "key": key_conversion(jam["annotations"][1]["data"][0].value),
         "representation": "ABC",
         "chords": chords,
     }
