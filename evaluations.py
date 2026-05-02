@@ -42,7 +42,7 @@ def jsd(progression_rn, dataset_rn):
     # --- Jensen-Shannon Divergence ---
     return 0.5 * kl(prog_dist, M) + 0.5 * kl(dataset_dist, M)
 
-def ngram(n=4, progression, dataset):
+def ngram(progression, dataset, n=4):
     """
     progression: list[str] (e.g., ["C:maj", "F:maj", ...])
     dataset: list[list[str]] (list of progressions)
