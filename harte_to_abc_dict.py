@@ -244,6 +244,140 @@ def harte_to_abc(chord):
 
     return "[" + " ".join(notes) + "]"
 
+SEMITONE_TO_ROMAN = {
+    0: "I",
+    1: "bII",
+    2: "II",
+    3: "bIII",
+    4: "III",
+    5: "IV",
+    6: "#IV",
+    7: "V",
+    8: "bVI",
+    9: "VI",
+    10: "bVII",
+    11: "VII",
+}
+
+def harte_to_roman(key, harte_prog):
+    key_semitone = ROOT_TO_SEMITONE[key]
+    roman_prog = []
+    for chord in harte_prog:
+        parsed = parse_harte(chord)
+        if parsed is None:
+            continue
+
+        root, quality, mods, bass = parsed
+        root_semitone = ROOT_TO_SEMITONE[root]
+
+        interval = (root_semitone - key_semitone) % 12
+        numeral = SEMITONE_TO_ROMAN.get(interval, "?")
+
+        # Normalize quality (collapse extensions)
+        q = quality.lower()
+
+        if "min" in q and "maj" not in q:
+            numeral = numeral.lower()
+        elif "dim7" in q:
+            numeral = numeral.lower() + "°7"
+        elif "dim" in q:
+            numeral = numeral.lower() + "°"
+        elif "aug" in q:
+            numeral = numeral + "+"
+        elif "7" in q and "maj7" not in q:
+            numeral = numeral + "7"
+        elif "maj7" in q:
+            numeral = numeral + "maj7"
+
+        roman_prog.append(numeral)
+
+    return roman_prog
+
+def abc_note_to_root(note):
+    # Convert ABC accidental notation back to pitch class
+    note = note.strip()
+
+    if note.startswith("^^"):
+        base = note[-1]
+        return base + "##"
+    elif note.startswith("__"):
+        base = note[-1]
+        return base + "bb"
+    elif note.startswith("^"):
+        base = note[-1]
+        return base + "#"
+    elif note.startswith("_"):
+        base = note[-1]
+        return base + "b"
+    else:
+        return note
+
+def abc_to_roman(key, abc_prog):
+    # Allow single chord input
+    if isinstance(abc_prog, str):
+        abc_prog = [abc_prog]
+
+    key_semitone = ROOT_TO_SEMITONE[key]
+    roman_prog = []
+
+    for chord in abc_prog:
+        # --- Normalize input format ---
+        if isinstance(chord, str):
+            notes = chord.strip("[]").split()
+        elif isinstance(chord, list):
+            notes = chord
+        else:
+            continue
+
+        if not notes:
+            continue
+
+        # --- Root (assume first note = bass/root) ---
+        root_note = abc_note_to_root(notes[0])
+        if root_note not in ROOT_TO_SEMITONE:
+            continue
+
+        root_semitone = ROOT_TO_SEMITONE[root_note]
+
+        # --- Interval relative to key ---
+        interval = (root_semitone - key_semitone) % 12
+        numeral = SEMITONE_TO_ROMAN.get(interval, "?")
+
+        # --- Build pitch class set ---
+        pitch_classes = []
+        for n in notes:
+            r = abc_note_to_root(n)
+            if r in ROOT_TO_SEMITONE:
+                pitch_classes.append(ROOT_TO_SEMITONE[r])
+
+        # --- Basic quality detection ---
+        has_minor_third = ((root_semitone + 3) % 12) in pitch_classes
+        has_major_third = ((root_semitone + 4) % 12) in pitch_classes
+        has_dim_fifth  = ((root_semitone + 6) % 12) in pitch_classes
+        has_dom_seventh = ((root_semitone + 10) % 12) in pitch_classes
+        has_maj_seventh = ((root_semitone + 11) % 12) in pitch_classes
+        has_dim_seventh = ((root_semitone + 9) % 12) in pitch_classes
+
+        # --- Apply Roman numeral formatting ---
+        if has_minor_third and not has_major_third:
+            numeral = numeral.lower()
+
+        if has_dim_fifth:
+            numeral = numeral.lower() + "°"
+
+        # Optional: keep 7ths (you can remove this to reduce sparsity)
+        if has_dom_seventh:
+            numeral += "7"
+        elif has_maj_seventh:
+            numeral += "maj7"
+        elif has_dim_seventh:
+            numeral += "7"
+
+        roman_prog.append(numeral)
+
+    return roman_prog
+
+
 def write_json_file(data, output_path):
     file = output_path[19:-5] #Get rid of v1.0.0/v1.0.0/jams/ from the start and .jams from the end.
     file = file + '_' + (data["representation"])
@@ -275,7 +409,7 @@ for jam_path in glob.glob("v1.0.0/v1.0.0/jams/billboard_*.jams"):
 #TESTING
 #chord1 = "C:maj7"
 #chord2 = "D:min7"
-#chord3 = "E:dim"
+chord3 = "E:dim"
 #chord4 = "Gb:maj9(#11)"
 #chord5 = "G:sus4(b7,9,13)"
 #chord6 = "Ab:sus4/2"
@@ -298,10 +432,18 @@ for jam_path in glob.glob("v1.0.0/v1.0.0/jams/billboard_*.jams"):
 
 #print(harte_to_abc(chord1))
 #print(harte_to_abc(chord2))
-#print(harte_to_abc(chord3))
+print(harte_to_abc(chord3))
 #print(harte_to_abc(chord4))
 #print(harte_to_abc(chord5))
 #print(harte_to_abc(chord6))
 #print(harte_to_abc(chord7))
 #print(harte_to_abc(chord8))
 #print(harte_to_abc(chord9))
+
+#prog1 = ["C:maj7", "D:min7", "E:dim", "F:maj7", "G:7", "A:min7", "B:hdim7"]
+#prog2 = ["C:maj", "F:maj", "G:maj", "C:maj"]
+prog3 = [["C", "E", "G"], ["F", "A", "C"], ["G", "Bb", "Db", "Fb"]]
+prog4 = ["C:maj", "F:maj", "G:dim7"]
+#print(harte_to_roman("C", prog1))
+print(abc_to_roman("Ab", prog3))
+print(harte_to_roman("Ab", prog4))
