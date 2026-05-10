@@ -1,3 +1,4 @@
+#Converts the Jsons to txt files and adds delimeter tokens 
 import json
 import os
 import glob
@@ -5,13 +6,6 @@ import sys
 
 
 def convert_folder(input_folder, output_file):
-    """
-    Converts all JSON chord files in a folder to a single train.txt
-    formatted for GPT-2 fine-tuning with Hugging Face Transformers.
-
-    Output format per song (one line):
-        <|title|> Song Name <|key|> C <|chords|> chord1 chord2 ... <|endoftext|>
-    """
     json_files = glob.glob(os.path.join(input_folder, "*.json"))
 
     if not json_files:
@@ -57,13 +51,12 @@ def convert_folder(input_folder, output_file):
 
 
 def main():
-    # Default paths — edit these if running without command line args
+    # Default paths
     abc_folder   = "data/ABC"
     harte_folder = "data/Harte"
     abc_output   = "train_abc.txt"
     harte_output = "train_harte.txt"
 
-    # Allow overrides via command line: python convert_chords.py <abc_folder> <harte_folder>
     if len(sys.argv) == 3:
         abc_folder   = sys.argv[1]
         harte_folder = sys.argv[2]
