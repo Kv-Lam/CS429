@@ -2,7 +2,7 @@
 
 A UTK COSC429 research project investigating whether chord notation systems affect LLM generation of chord progressions. Two notation formats are compared — **Harte** (`C:maj`) and **ABC** (`[C E G]`) — by fine-tuning GPT-2 on each and evaluating the generated progressions using Jensen-Shannon Divergence and n-gram novelty.
 
-> **Disclaimer:** The `results.ipynb` notebook, `evaluations.py`, and `harte_to_abc_dict.py` were developed with assistance from Claude (claude.ai/code). `harte_to_abc_dict.py` used Claude to help with the translation dictionary mapping and human-fixed/verified.
+> **Disclaimer:** The `results.ipynb` notebook, `evaluations.py`, and `harte_to_abc_dict.py` were developed with assistance from Claude (claude.ai/code). `results.ipynb` used Claude to assist with parsing generated output, loading the datasets, scaling the prompts to 250, and making the evaluation loop. `harte_to_abc_dict.py` used Claude to help with the translation dictionary mapping and human-fixed/verified.
 
 ---
 
